@@ -152,6 +152,6 @@ player.hp = 100;                 // restaura a vida
 
 ## 👤 Autor
 
-Feito por **GGusmão** — [@GGusm4o](https://github.com/GGusm4o)
+Feito por **GGusmão** e **Gustavo Meireles** — [@GGusm4o](https://github.com/GGusm4o)
 
 Se curtiu o jogo, deixe uma ⭐ no repositório!
