@@ -1,0 +1,323 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #0b0914;
+  color: #fff;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.hidden { display: none !important; }
+.opacity-0 { opacity: 0 !important; }
+
+/* ---------- Estrutura geral ---------- */
+#app {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+body.touch.portrait #app { justify-content: flex-start; }
+/* Retrato: palco centralizado na área acima dos controles */
+body.touch.portrait #stageWrap { margin: auto 0; }
+
+/* O tamanho do palco é definido por JS (sempre 16:9) e serve de "container" para as unidades cqw */
+#stageWrap {
+  container-type: size;
+  width: 800px;
+  height: 450px;
+  flex: none;
+}
+
+#stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0f172a;
+  border: 4px solid #d97706;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .6);
+  /* Toda a interface do palco escala em "em" a partir daqui */
+  font-size: clamp(8px, 2cqw, 36px);
+}
+body.touch.landscape #stage { border-width: 2px; border-radius: 4px; }
+body.touch.portrait #stage { border-width: 2px; border-radius: 0 0 6px 6px; }
+
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: #110d1f;
+}
+#gameCanvas { display: block; width: 100%; height: 100%; }
+
+/* ---------- Botão pixel ---------- */
+.pixel-btn {
+  background: #7c2d12;
+  color: #fde68a;
+  border: .25em solid #f97316;
+  box-shadow: inset -.25em -.25em 0 #451a03, inset .25em .25em 0 #fdba74;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform .1s, background .15s;
+}
+.pixel-btn:hover { background: #9a3412; }
+.pixel-btn:active { transform: scale(.95); }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- Tela inicial ---------- */
+#startScreen {
+  z-index: 20;
+  justify-content: space-between;
+  padding: 1.2em 1em;
+  background: rgba(2, 6, 23, .4);
+}
+#coverCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.title-wrap { display: flex; flex-direction: column; align-items: center; gap: .4em; text-align: center; margin-top: .3em; }
+.game-title {
+  margin: 0;
+  font-size: max(17px, 3em);
+  color: #fbbf24;
+  text-shadow: 0 .12em 0 #000;
+  letter-spacing: .05em;
+  animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
+}
+@keyframes pulse { 50% { opacity: .5; } }
+.subtitle {
+  margin: 0;
+  font-size: max(8px, .75em);
+  color: #fde68a;
+  background: rgba(2, 6, 23, .8);
+  padding: .4em 1em;
+  border-radius: .3em;
+  border: 1px solid rgba(245, 158, 11, .4);
+}
+.start-actions { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: .7em; margin-bottom: .3em; }
+#startBtn { padding: .8em 2em; font-size: max(14px, 1.875em); }
+.secondary-row { display: flex; gap: .6em; align-items: center; }
+#continueBtn { padding: .7em 1.6em; font-size: max(11px, 1.35em); }
+#startBtn.compact { padding: .55em 1.4em; font-size: max(9px, 1em); }
+#toast {
+  position: absolute; top: 30%; left: 50%; transform: translateX(-50%);
+  z-index: 12; pointer-events: none; white-space: nowrap;
+  font-size: max(8px, .9em); color: #fde68a;
+  background: rgba(15, 23, 42, .92); border: 1px solid rgba(245, 158, 11, .6);
+  border-radius: .3em; padding: .5em 1em;
+  opacity: 0; transition: opacity .25s;
+}
+#toast.show { opacity: 1; }
+#pauseBtn {
+  position: absolute; bottom: .6em; left: 50%; transform: translateX(-50%);
+  z-index: 11; display: none; align-items: center; justify-content: center;
+  width: 2.6em; height: 2.6em; padding: 0; font-size: max(9px, 1.1em);
+  background: rgba(30, 41, 59, .75); color: #e2e8f0;
+  border: 2px solid #475569; border-radius: .5em; cursor: pointer; opacity: .8;
+}
+#pauseBtn:hover { opacity: 1; background: rgba(217, 119, 6, .8); }
+body.playing #pauseBtn { display: flex; }
+#pauseScreen {
+  z-index: 35; justify-content: center; gap: .7em; padding: 1em;
+  background: rgba(2, 6, 23, .82); backdrop-filter: blur(3px);
+}
+#pauseScreen h2 { margin: 0 0 .3em; font-size: max(14px, 2.4em); color: #fbbf24; text-shadow: 0 .12em 0 #000; }
+.menu-btn { width: min(20em, 85%); padding: .6em .5em; font-size: max(9px, 1em); }
+body.paused #mobileControls { opacity: .35; }
+body.paused .ctl-group { pointer-events: none !important; }
+.small-btn { padding: .6em 1em; font-size: max(8px, .7em); }
+#rotateHint {
+  display: none;
+  font-size: max(7px, .6em);
+  color: #fde68a;
+  background: rgba(2, 6, 23, .8);
+  padding: .5em .8em;
+  border-radius: .3em;
+  text-align: center;
+  line-height: 1.5;
+}
+body.touch.portrait #rotateHint { display: block; }
+
+/* ---------- Lore ---------- */
+#loreScreen {
+  z-index: 25;
+  justify-content: center;
+  background: rgba(2, 6, 23, .95);
+  padding: 1em 1.2em;
+  text-align: center;
+}
+.lore-inner { width: 100%; max-width: 46em; height: 100%; max-height: 100%; display: flex; flex-direction: column; gap: .6em; min-height: 0; }
+.lore-head { display: flex; justify-content: space-between; align-items: center; gap: .6em; flex: none; }
+.lore-head h2 { margin: 0; font-size: max(10px, 1.5em); color: #fbbf24; text-shadow: 0 .1em 0 #000; text-align: left; }
+#skipBtn { padding: .5em .8em; font-size: max(7px, .7em); color: #fcd34d; white-space: nowrap; }
+#loreTextContainer {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: max(8px, .85em);
+  color: #cbd5e1;
+  line-height: 1.7;
+  padding: .8em;
+  border: 1px solid rgba(245, 158, 11, .3);
+  border-radius: .4em;
+  background: rgba(15, 23, 42, .9);
+  text-align: left;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .5);
+}
+#loreTextContainer p { margin: 0 0 .9em; }
+#loreTextContainer p:last-child { margin: 0; }
+#okBtn { flex: none; width: 100%; padding: .7em .5em; font-size: max(9px, 1.05em); }
+
+/* ---------- Game over / vitória ---------- */
+#msgScreen {
+  z-index: 30;
+  justify-content: center;
+  background: rgba(0, 0, 0, .85);
+  backdrop-filter: blur(4px);
+  padding: 1em;
+  text-align: center;
+}
+#msgTitle { margin: 0 0 .5em; font-size: max(16px, 3em); text-shadow: 0 .12em 0 #000; }
+#msgTitle.lose { color: #ef4444; }
+#msgTitle.win { color: #fbbf24; }
+#msgDesc { margin: 0 0 1.2em; font-size: max(8px, .85em); color: #cbd5e1; max-width: 32em; line-height: 1.7; }
+#restartBtn { padding: .8em 1.6em; font-size: max(10px, 1.1em); }
+
+/* ---------- HUD ---------- */
+#hud {
+  position: absolute;
+  top: .6em; left: .6em; right: .6em;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: .5em;
+  pointer-events: none;
+  font-size: max(8px, .85em);
+}
+.hud-box {
+  background: rgba(15, 23, 42, .8);
+  border: 1px solid rgba(245, 158, 11, .5);
+  border-radius: .3em;
+  padding: .45em .6em;
+  min-width: 0;
+}
+.hud-row { display: flex; align-items: center; gap: .5em; }
+.hud-row + .hud-row { margin-top: .35em; }
+.bar { background: #1e293b; border: 1px solid #475569; border-radius: .25em; overflow: hidden; height: .85em; }
+.bar > div { height: 100%; }
+.bar-hp { width: 20cqw; }
+.bar-mp { width: 14cqw; height: .65em; }
+.bar-st { width: 17cqw; height: .65em; }
+.bar-boss { width: 18cqw; }
+#hpBar { background: #dc2626; transition: width .2s; }
+#mpBar { background: #3b82f6; transition: width .2s; }
+#stBar { background: #a3e635; transition: background .15s; }
+#stBar.low { background: #78716c; }
+#bossHpBar { background: #9333ea; transition: width .15s; }
+.lbl-hp { color: #f87171; }
+.lbl-mp { color: #60a5fa; }
+.lbl-st { color: #a3e635; }
+.hud-stage { text-align: center; color: #fbbf24; font-weight: bold; border-color: rgba(245, 158, 11, .5); max-width: 32cqw; }
+#stageTitleHud { font-size: .65em; color: #cbd5e1; margin-top: .3em; line-height: 1.4; font-weight: normal; }
+#bossHud { border-color: rgba(239, 68, 68, .5); display: flex; flex-direction: column; align-items: flex-end; gap: .35em; max-width: 30cqw; transition: opacity .3s; }
+#bossName { color: #f87171; font-size: .8em; text-align: right; line-height: 1.4; }
+
+/* ---------- Teclado (PC) ---------- */
+#kbHints {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .5em 1.2em;
+  margin-top: 8px;
+  padding: 8px 12px;
+  max-width: 100%;
+  font-size: 10px;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, .6);
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+body.touch #kbHints { display: none; }
+
+/* ---------- Controles touch ---------- */
+#mobileControls { display: none; z-index: 40; }
+body.touch.playing #mobileControls { display: flex; }
+
+.ctl-btn {
+  width: var(--b);
+  height: var(--b);
+  border-radius: 14px;
+  border: 2px solid #475569;
+  background: rgba(30, 41, 59, .78);
+  color: #e2e8f0;
+  font-weight: bold;
+  font-size: max(7px, calc(var(--b) * .13));   /* 6 letras da fonte pixel precisam caber no botão */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;      /* quem recebe o toque é o grupo (permite arrastar o dedo) */
+  transition: transform .06s, background .06s;
+}
+.ctl-btn.dir { font-size: calc(var(--b) * .42); }
+.ctl-btn.nostam { opacity: .45; }
+.ctl-btn.active { transform: scale(.93); background: rgba(217, 119, 6, .9); }
+#btnJump   { background: rgba(120, 53, 15, .78);  border-color: #d97706; color: #fde68a; }
+#btnAttack { background: rgba(127, 29, 29, .78);  border-color: #dc2626; color: #fecaca; }
+#btnDash   { background: rgba(12, 74, 110, .78);  border-color: #0284c7; color: #bae6fd; }
+#btnMagic  { background: rgba(88, 28, 135, .78);  border-color: #9333ea; color: #e9d5ff; }
+#btnJump.active   { background: rgba(217, 119, 6, .95); }
+#btnAttack.active { background: rgba(220, 38, 38, .95); }
+#btnDash.active   { background: rgba(2, 132, 199, .95); }
+#btnMagic.active  { background: rgba(147, 51, 234, .95); }
+
+.ctl-group { display: flex; gap: 8px; touch-action: none; }
+#actions { flex-wrap: wrap; justify-content: flex-end; }
+
+/* Retrato: palco no topo, controles grandes embaixo */
+body.touch.portrait #mobileControls {
+  --b: clamp(54px, 17vw, 84px);
+  position: relative;
+  flex: none;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+body.touch.portrait #actions { width: calc(var(--b) * 2 + 8px); }
+body.touch.portrait #dpad { gap: 12px; }
+
+/* Paisagem: controles sobrepostos ao jogo, nos cantos da tela */
+body.touch.landscape #mobileControls {
+  --b: clamp(46px, 14vh, 70px);
+  position: fixed;
+  inset: 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  pointer-events: none;
+  padding: 0 max(env(safe-area-inset-right, 0px), 14px) max(env(safe-area-inset-bottom, 0px), 10px) max(env(safe-area-inset-left, 0px), 14px);
+}
+body.touch.landscape .ctl-group { pointer-events: auto; opacity: .8; }
+body.touch.landscape #actions { flex-wrap: nowrap; }
