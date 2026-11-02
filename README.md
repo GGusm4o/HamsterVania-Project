@@ -1,6 +1,6 @@
 # 🐹⚔️ HamsterVania: O Cavaleiro Valente
 
-> **A vingança contra o vampiro.** Um jogo de plataforma 2D estilo *Metroidvania / boss rush*, feito em **um único arquivo HTML** com JavaScript puro. Sem instalação, sem dependências, joga direto no navegador — no **PC** ou no **celular**.
+> **A vingança contra o vampiro.** Um jogo de plataforma 2D estilo *Metroidvania / boss rush*, feito com HTML, CSS e JavaScript puro. Sem instalação, sem dependências, joga direto no navegador — no **PC** ou no **celular**.
 
 ![HTML5](https://img.shields.io/badge/HTML5-Canvas-e34f26?logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-f7df1e?logo=javascript&logoColor=black)
@@ -31,7 +31,7 @@ O temível **Conde Drácula** e seu exército de monstros roubaram todo o estoqu
 
 ### Opção 1 — Direto no navegador
 
-1. Baixe o arquivo [`HamsterVania.html`](HamsterVania.html).
+1. Baixe ou clone o repositório.
 2. Abra com um navegador moderno (Chrome, Edge, Firefox ou Safari).
 3. Clique em **JOGAR** (ou aperte **Enter**).
 
@@ -42,7 +42,7 @@ git clone https://github.com/GGusm4o/HamsterVania-Project.git
 cd HamsterVania-Project
 ```
 
-Depois é só abrir o `HamsterVania.html` no navegador. Não precisa de servidor nem de build.
+Depois é só abrir o `index.html` no navegador. Não precisa de servidor nem de build.
 
 > 💡 A fonte *Press Start 2P* é carregada do Google Fonts. Sem internet o jogo funciona normalmente, com uma fonte de reserva.
 
@@ -114,8 +114,13 @@ Navegadores modernos com suporte a container queries: Chrome/Edge 105+, Safari 1
 
 ```
 HamsterVania-Project/
-├── HamsterVania.html             # O jogo completo (HTML + CSS + JS)
-├── HamsterVania-DOCUMENTACAO.md  # Documentação técnica detalhada
+├── index.html                    # Estrutura da página e interface do jogo
+├── css/
+│   └── style.css                 # Estilos e layout responsivo
+├── js/
+│   └── main.js                   # Lógica do jogo
+├── docs/
+│   └── HamsterVania-DOCUMENTACAO.md  # Documentação técnica detalhada
 └── README.md                     # Este arquivo
 ```
 
@@ -123,7 +128,7 @@ HamsterVania-Project/
 
 ## 📚 Documentação técnica
 
-Quer entender ou modificar o código? A documentação completa está em [`HamsterVania-DOCUMENTACAO.md`](HamsterVania-DOCUMENTACAO.md) e cobre:
+Quer entender ou modificar o código? A documentação completa está em [`docs/HamsterVania-DOCUMENTACAO.md`](docs/HamsterVania-DOCUMENTACAO.md) e cobre:
 
 - estrutura do arquivo, interface e layout responsivo
 - loop principal, física, jogador, inimigos e chefões (com os padrões de ataque de cada um)

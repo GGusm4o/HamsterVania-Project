@@ -1,8 +1,8 @@
 # HamsterVania: O Cavaleiro Valente — Documentação Técnica
 
-> Jogo de plataforma 2D estilo *Metroidvania/boss rush* em **um único arquivo HTML** (HTML + CSS + JavaScript puro, Canvas 2D e Web Audio). Sem frameworks, sem build, sem dependências obrigatórias.
+> Jogo de plataforma 2D estilo *Metroidvania/boss rush* em HTML, CSS e JavaScript puro, Canvas 2D e Web Audio. Sem frameworks, sem build, sem dependências obrigatórias.
 
-- **Arquivo:** `HamsterVania.html` (~2.500 linhas)
+- **Arquivos principais:** `index.html`, `css/style.css` e `js/main.js`
 - **Idioma da interface:** Português (pt-BR)
 - **Plataformas:** PC (teclado/mouse) e celular/tablet (touch), em retrato e paisagem
 - **Resolução lógica do jogo:** 800 × 450 px (16:9), escalada por CSS para qualquer tela
@@ -70,7 +70,7 @@ x = 0                                    x = 2000        x = 2800
 
 ### Executar
 
-Basta abrir `HamsterVania.html` em um navegador moderno (Chrome, Edge, Firefox, Safari). Não precisa de servidor.
+Basta abrir `index.html` em um navegador moderno (Chrome, Edge, Firefox, Safari). Não precisa de servidor.
 
 > A fonte **Press Start 2P** é carregada do Google Fonts. Sem internet o jogo funciona normalmente com fonte monoespaçada de reserva.
 
